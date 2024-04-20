@@ -28,7 +28,7 @@ public class AuthenticationController extends HttpServlet {
         // Proceed with your method logic
         service.processAuthentication(authentication,resp);
 
-        super.doGet(req, resp);
+
     }
 
 

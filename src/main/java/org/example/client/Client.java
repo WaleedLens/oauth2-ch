@@ -12,7 +12,7 @@ public class Client implements Identifiable<Long> {
     private String name;
     private String website;
     private String logo;
-    private String redirectURI;
+    private String redirectUri;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -20,11 +20,11 @@ public class Client implements Identifiable<Long> {
 
     }
 
-    public Client(String name, String website, String logo, String redirectURI) {
+    public Client(String name, String website, String logo, String redirectUri) {
         this.name = name;
         this.website = website;
         this.logo = logo;
-        this.redirectURI = redirectURI;
+        this.redirectUri = redirectUri;
 
     }
 
@@ -53,12 +53,12 @@ public class Client implements Identifiable<Long> {
         this.logo = logo;
     }
 
-    public String getRedirectURI() {
-        return redirectURI;
+    public String getRedirectUri() {
+        return redirectUri;
     }
 
-    public void setRedirectURI(String redirectURI) {
-        this.redirectURI = redirectURI;
+    public void setRedirectURI(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
     public Timestamp getCreatedAt() {
@@ -91,12 +91,12 @@ public class Client implements Identifiable<Long> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Client client)) return false;
-        return Objects.equals(getId(), client.getId()) && Objects.equals(getName(), client.getName()) && Objects.equals(getWebsite(), client.getWebsite()) && Objects.equals(getLogo(), client.getLogo()) && Objects.equals(getRedirectURI(), client.getRedirectURI()) && Objects.equals(getCreatedAt(), client.getCreatedAt()) && Objects.equals(getUpdatedAt(), client.getUpdatedAt());
+        return Objects.equals(getId(), client.getId()) && Objects.equals(getName(), client.getName()) && Objects.equals(getWebsite(), client.getWebsite()) && Objects.equals(getLogo(), client.getLogo()) && Objects.equals(getRedirectUri(), client.getRedirectUri()) && Objects.equals(getCreatedAt(), client.getCreatedAt()) && Objects.equals(getUpdatedAt(), client.getUpdatedAt());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getWebsite(), getLogo(), getRedirectURI(), getCreatedAt(), getUpdatedAt());
+        return Objects.hash(getId(), getName(), getWebsite(), getLogo(), getRedirectUri(), getCreatedAt(), getUpdatedAt());
     }
 
     @Override
@@ -106,7 +106,7 @@ public class Client implements Identifiable<Long> {
                 ", name='" + name + '\'' +
                 ", website='" + website + '\'' +
                 ", logo='" + logo + '\'' +
-                ", redirectURI='" + redirectURI + '\'' +
+                ", redirectURI='" + redirectUri + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

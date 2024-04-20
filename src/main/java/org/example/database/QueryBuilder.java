@@ -47,12 +47,13 @@ public class QueryBuilder {
         T instance = clazz.newInstance();
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();
-
         for (int i = 1; i <= columnCount; i++) {
             String columnName = metaData.getColumnName(i);
             Object columnValue = resultSet.getObject(i);
-
-            Field field = clazz.getDeclaredField(columnName);
+            Field field = clazz.getDeclaredField(ColumnConverter.columnToMember(columnName));
+            if (field.getType() == Long.class && columnValue instanceof Integer) {
+                columnValue = ((Integer) columnValue).longValue();
+            }
             field.setAccessible(true);
             field.set(instance, columnValue);
         }
@@ -177,7 +178,7 @@ public class QueryBuilder {
     }
 
     public <T> T find(Table table, Class<T> clazz) {
-        String className = table.getName();
+        String className = ClassFinder.findClassName(table.getName());
         try {
             Class<?> tableClass = Class.forName(className);
             TableEntity tableEntity = tableClass.getAnnotation(TableEntity.class);
@@ -194,7 +195,7 @@ public class QueryBuilder {
     }
 
     public <T> List<T> findAll(Table table, Class<T> clazz) {
-        String className = table.getName();
+        String className = ClassFinder.findClassName(table.getName());
         try {
             Class<?> tableClass = Class.forName(className);
             TableEntity tableEntity = tableClass.getAnnotation(TableEntity.class);

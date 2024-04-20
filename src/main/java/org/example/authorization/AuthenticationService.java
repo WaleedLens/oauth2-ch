@@ -6,7 +6,6 @@ import org.example.client.ClientRepository;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -54,7 +53,7 @@ public class AuthenticationService {
     public void storeAuthorizationCode(String authorizationCode, Authentication authentication) {
         try {
             // Encrypt the authorization code
-            Key key = new SecretKeySpec("encryptionKey".getBytes(), "AES");
+            Key key = new SecretKeySpec("encryptionKey123".getBytes(), "AES"); // 16 bytes key
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encryptedAuthorizationCode = cipher.doFinal(authorizationCode.getBytes());
@@ -100,7 +99,7 @@ public class AuthenticationService {
         }
 
         // Validate the redirect URI
-        if (!client.getRedirectURI().equals(authentication.getRedirectUri())) {
+        if (!client.getRedirectUri().equals(authentication.getRedirectUri())) {
             throw new IllegalArgumentException("Invalid redirect URI");
         }
 

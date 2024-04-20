@@ -29,7 +29,9 @@ public class ClientRepository implements Repository<Client> {
 
     @Override
     public Client find(Long id) {
-        Table table = queryBuilder.objectToTable(new Client());
+        Client c = new Client();
+        c.setId(id);
+        Table table = queryBuilder.objectToTable(c);
         return queryBuilder.find(table, Client.class);
     }
 
