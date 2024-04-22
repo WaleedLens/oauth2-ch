@@ -15,11 +15,11 @@ public class Connector {
     }
 
     private Connection getConnection() throws SQLException {
-        String dbUrl = "jdbc:postgresql://localhost:5433/auth_server"; //TODO: remove this line
-        String user = "postgres"; // TODO:remove this line
-        String password = "123qwe"; // TODO: remove this line
-        logger.info("Information: " + dbUrl + " " + user + " " + password); //TODO: remove this line
-        logger.info("Connecting to database with url: " + dbUrl);
+        String dbUrl = System.getenv("db_host");
+        String user = System.getenv("db_username");
+        String password = System.getenv("db_password");
+
+        logger.info("Connecting to database with url: {}", dbUrl);
 
         return DriverManager.getConnection(dbUrl, user, password);
     }

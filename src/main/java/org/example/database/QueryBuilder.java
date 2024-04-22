@@ -32,7 +32,7 @@ public class QueryBuilder {
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);  // Make private fields accessible
             try {
-                logger.info("Field name: " + ColumnConverter.memberToColumn(field.getName()) + " Field value: " + field.get(object));
+                logger.info("Field name: {} Field value: {}", ColumnConverter.memberToColumn(field.getName()), field.get(object));
                 fieldNames.add(ColumnConverter.memberToColumn(field.getName()));
                 fieldValues.add(field.get(object));
             } catch (IllegalAccessException e) {
@@ -81,10 +81,10 @@ public class QueryBuilder {
         }
 
         // Correctly remove the last comma and space if necessary
-        if (fields.length() > 0) {
+        if (!fields.isEmpty()) {
             fields.setLength(fields.length() - 2); // removes the last ", "
         }
-        if (values.length() > 0) {
+        if (!values.isEmpty()) {
             values.setLength(values.length() - 2); // removes the last ", "
         }
 
@@ -107,21 +107,21 @@ public class QueryBuilder {
         }
 
         // Correctly remove the last comma and space if necessary
-        if (fields.length() > 0) {
+        if (!fields.isEmpty()) {
             fields.setLength(fields.length() - 2); // removes the last ", "
         }
-        if (values.length() > 0) {
+        if (!values.isEmpty()) {
             values.setLength(values.length() - 2); // removes the last ", "
         }
 
         String statement = "INSERT INTO " + tableName + " (" + fields.toString() + ") VALUES (" + values.toString() + ");";
-        logger.info("Generated insert statement: " + statement);
+        logger.info("Generated insert statement: {}", statement);
         return statement;
     }
 
     private String buildSelectStatement(String tableName, String idField, Object idValue) {
         String statement = "SELECT * FROM " + tableName + " WHERE " + idField + " = '" + idValue.toString().replace("'", "''") + "';";
-        logger.info("Generated select statement: " + statement);
+        logger.info("Generated select statement: {}", statement);
         return statement;
     }
 
@@ -133,11 +133,11 @@ public class QueryBuilder {
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
             String statement = buildInsertStatement(tableEntity.tableName(), table.getFields(), table.getValues());
             long id = connector.executeUpdate(statement);
-            logger.info("Inserted object into table: " + table.getName() + "ID: " + id);
+            logger.info("Inserted object into table: {}ID: {}", table.getName(), id);
 
             return id;
         } catch (ClassNotFoundException e) {
-            logger.error("Error inserting object into table: " + table.getName());
+            logger.error("Error inserting object into table: {}", table.getName());
             e.printStackTrace();
         }
         return -1;
@@ -150,11 +150,11 @@ public class QueryBuilder {
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
             String statement = buildDeleteStatement(tableEntity.tableName(), table.getFields().get(0), table.getValues().get(0));
             long id = connector.executeUpdate(statement);
-            logger.info("Deleted object from table: " + table.getName() + "ID: " + id);
+            logger.info("Deleted object from table: {}ID: {}", table.getName(), id);
 
             return id;
         } catch (ClassNotFoundException e) {
-            logger.error("Error deleting object from table: " + table.getName());
+            logger.error("Error deleting object from table: {}", table.getName());
             e.printStackTrace();
         }
         return -1;
@@ -167,11 +167,11 @@ public class QueryBuilder {
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
             String statement = buildUpdateStatement(tableEntity.tableName(), table.getFields(), table.getValues(), table.getFields().get(0), table.getValues().get(0));
             long id = connector.executeUpdate(statement);
-            logger.info("Updated object in table: " + table.getName() + "ID: " + id);
+            logger.info("Updated object in table: {}ID: {}", table.getName(), id);
 
             return id;
         } catch (ClassNotFoundException e) {
-            logger.error("Error updating object in table: " + table.getName());
+            logger.error("Error updating object in table: {}", table.getName());
             e.printStackTrace();
         }
         return -1;
@@ -184,11 +184,11 @@ public class QueryBuilder {
             TableEntity tableEntity = tableClass.getAnnotation(TableEntity.class);
             String statement = buildSelectStatement(tableEntity.tableName(), table.getFields().get(0), table.getValues().get(0));
             List<T> results = connector.executeQuery(statement, clazz);
-            logger.info("Found object in table: " + table.getName());
+            logger.info("Found object in table: {}", table.getName());
 
             return results.get(0);
         } catch (ClassNotFoundException e) {
-            logger.error("Error finding object in table: " + table.getName());
+            logger.error("Error finding object in table: {}", table.getName());
             e.printStackTrace();
         }
         return null;
