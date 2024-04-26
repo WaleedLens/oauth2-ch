@@ -1,5 +1,6 @@
 package org.example;
 
+import com.google.inject.Inject;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -13,6 +14,12 @@ public class WebServer {
     org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(WebServer.class);
 
     private ServletContextHandler context;
+
+    @Inject
+    private ClientController clientController;
+
+    @Inject
+    private AuthenticationController authenticationController;
 
     public static WebServer getInstance() {
         return WEB_SERVER_OBJECT;
@@ -32,10 +39,9 @@ public class WebServer {
             Server server = new Server(port);
             server.setHandler(getServletContextHandler());
 
-
             // --> servlets <--
-            addServlet(new ClientController(), "/client");
-            addServlet(new AuthenticationController(), "/auth");
+            addServlet(clientController, "/client");
+            addServlet(authenticationController, "/auth");
 
             server.start();
             logger.info("Starting server on port: {}", port);

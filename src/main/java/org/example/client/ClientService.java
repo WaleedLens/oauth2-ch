@@ -1,5 +1,6 @@
 package org.example.client;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import org.example.clientAuth.ClientAuth;
 import org.example.clientAuth.ClientAuthRepository;
@@ -10,8 +11,14 @@ import java.util.UUID;
 
 public class ClientService {
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(ClientService.class);
-    private final ClientRepository clientRepository = new ClientRepository();
-    private final ClientAuthRepository clientAuthRepository = new ClientAuthRepository();
+    private final ClientRepository clientRepository;
+    private final ClientAuthRepository clientAuthRepository;
+
+    @Inject
+    public ClientService(ClientRepository clientRepository, ClientAuthRepository clientAuthRepository) {
+        this.clientRepository = clientRepository;
+        this.clientAuthRepository = clientAuthRepository;
+    }
 
     public void save(String json) {
         // Save client

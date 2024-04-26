@@ -1,5 +1,6 @@
 package org.example.authorization;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -9,9 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AuthenticationController extends HttpServlet {
-    private final AuthenticationService service = new AuthenticationService();
+    private final AuthenticationService service;
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationController.class);
 
+    @Inject
+    public AuthenticationController(AuthenticationService service) {
+        this.service = service;
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

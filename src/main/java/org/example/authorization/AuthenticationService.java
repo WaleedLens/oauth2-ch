@@ -1,5 +1,6 @@
 package org.example.authorization;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import org.example.client.Client;
 import org.example.client.ClientRepository;
@@ -16,10 +17,15 @@ import java.util.Base64;
 import java.util.Date;
 
 public class AuthenticationService {
-    private final ClientRepository repository = new ClientRepository();
-    private final AuthorizationRepository authorizationCodeRepository = new AuthorizationRepository();
+    private final ClientRepository repository;
+    private final AuthorizationRepository authorizationCodeRepository;
     private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationService.class);
 
+    @Inject
+    public AuthenticationService(ClientRepository repository, AuthorizationRepository authorizationCodeRepository) {
+        this.repository = repository;
+        this.authorizationCodeRepository = authorizationCodeRepository;
+    }
 
     public void processAuthentication(Authentication authentication, HttpServletResponse resp) {
         // Validate the response type

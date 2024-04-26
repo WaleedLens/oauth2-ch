@@ -1,5 +1,6 @@
 package org.example.client;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -8,8 +9,13 @@ import java.io.IOException;
 
 
 public class ClientController extends HttpServlet {
-    private final ClientService service = new ClientService();
+    private final ClientService service;
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(ClientController.class);
+
+    @Inject
+    public ClientController(ClientService service) {
+        this.service = service;
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
