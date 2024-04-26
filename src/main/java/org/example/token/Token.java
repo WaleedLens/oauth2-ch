@@ -1,7 +1,9 @@
 package org.example.token;
 
+import org.example.annotations.TableEntity;
 import org.example.database.Identifiable;
 
+@TableEntity(tableName = "tokens")
 public class Token implements Identifiable<Long> {
     private String accessToken;
     private int expiresIn;
