@@ -63,7 +63,7 @@ public class QueryBuilder {
 
     private String buildDeleteStatement(String tableName, String idField, Object idValue) {
         String statement = "DELETE FROM " + tableName + " WHERE " + idField + " = '" + idValue.toString().replace("'", "''") + "';";
-        logger.info("Generated delete statement: " + statement);
+        logger.info("Generated delete statement: {}", statement);
         return statement;
     }
 

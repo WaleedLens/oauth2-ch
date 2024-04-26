@@ -1,5 +1,6 @@
 package org.example.utils;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
@@ -28,6 +29,19 @@ public class OAuthUtils {
         byte[] bytes = new byte[32]; // 256-bit
         RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    /**
+     * This method generates a unique access token for OAuth 2.0 authentication.
+     * It creates a new BigInteger instance with a bit length of 130 using a SecureRandom object as the source of randomness.
+     * The bit length of 130 ensures the uniqueness of the generated access token.
+     * The BigInteger value is then converted to a string representation in base 32, resulting in a URL-safe string.
+     *
+     * @return A unique, URL-safe access token.
+     */
+    public static String generateAccessToken(){
+        SecureRandom secureRandom = new SecureRandom();
+        return new BigInteger(130, secureRandom).toString(32);
     }
 
 
