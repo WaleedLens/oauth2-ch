@@ -39,14 +39,10 @@ public class OAuthUtils {
      *
      * @return A unique, URL-safe access token.
      */
-    public static String generateAccessToken(){
+    public static String generateAccessToken() {
         SecureRandom secureRandom = new SecureRandom();
         return new BigInteger(130, secureRandom).toString(32);
     }
-
-
-
-
 
 
 }

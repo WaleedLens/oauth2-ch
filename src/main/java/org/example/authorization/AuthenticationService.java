@@ -63,10 +63,10 @@ public class AuthenticationService {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encryptedAuthorizationCode = cipher.doFinal(authorizationCode.getBytes());
-
+            String encryptedAuthorizationCodeStr = new String(encryptedAuthorizationCode, StandardCharsets.UTF_8);
             // Create an AuthorizationCode object
             AuthorizationCode code = new AuthorizationCode();
-            code.setCode(encryptedAuthorizationCode);
+            code.setCode(encryptedAuthorizationCodeStr);
             code.setClientId(authentication.getClientId());
             code.setRedirectUri(authentication.getRedirectUri());
             code.setScope(authentication.getScope());
