@@ -1,12 +1,19 @@
 package org.example.token;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class TokenDTO {
+    @JsonProperty("grant_type")
     private String grantType;
+    @JsonProperty("client_id")
     private String clientId;
+    @JsonProperty("client_secret")
     private String clientSecret;
+    @JsonProperty("code")
     private String code;
+    @JsonProperty("redirect_uri")
     private String redirectUri;
 
     public TokenDTO() {

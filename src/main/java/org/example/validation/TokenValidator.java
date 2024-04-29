@@ -1,47 +1,53 @@
 package org.example.validation;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.exception.ValidationException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
-public class TokenValidator implements Validator<HttpServletRequest> {
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+public class TokenValidator implements Validator<JsonNode> {
 
 
     @Override
-    public void validate(HttpServletRequest request) throws ValidationException {
-        validateGrantType(request);
-        validateCode(request);
-        validateRedirectUri(request);
-        validateClientId(request);
-        validateClientSecret(request);
+    public void validate(JsonNode jsonNode) throws ValidationException {
+
+        validateGrantType(jsonNode);
+        validateCode(jsonNode);
+        validateRedirectUri(jsonNode);
+        validateClientId(jsonNode);
+        validateClientSecret(jsonNode);
     }
 
-    private void validateGrantType(HttpServletRequest request) throws ValidationException {
-        if (request.getParameter("grant_type") == null) {
+    private void validateGrantType(JsonNode node) throws ValidationException {
+        if (node.get("grant_type") == null) {
             throw new ValidationException("grant_type is missing");
         }
     }
 
-    private void validateCode(HttpServletRequest request) throws ValidationException {
-        if (request.getParameter("code") == null) {
+    private void validateCode(JsonNode node) throws ValidationException {
+        if (node.get("code") == null) {
             throw new ValidationException("code is missing");
         }
     }
 
-    private void validateRedirectUri(HttpServletRequest request) throws ValidationException {
-        if (request.getParameter("redirect_uri") == null) {
+    private void validateRedirectUri(JsonNode node) throws ValidationException {
+        if (node.get("redirect_uri") == null) {
             throw new ValidationException("redirect_uri is missing");
         }
     }
 
-    private void validateClientId(HttpServletRequest request) throws ValidationException {
-        if (request.getParameter("client_id") == null) {
+    private void validateClientId(JsonNode node) throws ValidationException {
+        if (node.get("client_id") == null) {
             throw new ValidationException("client_id is missing");
         }
     }
 
-    private void validateClientSecret(HttpServletRequest request) throws ValidationException {
-        if (request.getParameter("client_secret") == null) {
+    private void validateClientSecret(JsonNode node) throws ValidationException {
+        if (node.get("client_secret") == null) {
             throw new ValidationException("client_secret is missing");
         }
     }

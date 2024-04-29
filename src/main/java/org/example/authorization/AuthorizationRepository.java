@@ -30,7 +30,9 @@ public class AuthorizationRepository implements Repository<AuthorizationCode>{
 
     @Override
     public AuthorizationCode find(Long id) {
-        Table table = queryBuilder.objectToTable(new AuthorizationCode());
+        AuthorizationCode authorizationCode = new AuthorizationCode();
+        authorizationCode.setId(id);
+        Table table = queryBuilder.objectToTable(authorizationCode);
         return queryBuilder.find(table, AuthorizationCode.class);
     }
 

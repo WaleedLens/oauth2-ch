@@ -10,13 +10,14 @@ import java.util.Objects;
 
 @TableEntity(tableName = "authorization_code")
 public class AuthorizationCode implements Identifiable<Long> {
+    private Long id;
     private String code;
     private long clientId;
     private String redirectUri;
     private String scope;
     private Date createdDate;
     private Date expiryDate;
-    private Long id;
+
 
 
     public AuthorizationCode() {

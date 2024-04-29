@@ -1,9 +1,9 @@
 package org.example.token;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.exception.ValidationException;
 import org.example.utils.JsonHandler;
 import org.example.validation.TokenValidator;
 
@@ -27,20 +27,16 @@ public class TokenController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            tokenValidator.validate(req);
+            JsonNode nodes = JsonHandler.readTree(req.getReader());
+            tokenValidator.validate(nodes);
             logger.info("Token request is valid");
 
-            StringBuilder requestBody = new StringBuilder();
-            String line;
-            while ((line = req.getReader().readLine()) != null) {
-                requestBody.append(line);
-            }
-
-            TokenDTO tokenDTO = (TokenDTO) JsonHandler.toObject(requestBody.toString(), TokenDTO.class);
+            logger.info("Request body: {}", nodes.toPrettyString());
+            TokenDTO tokenDTO = (TokenDTO) JsonHandler.toObject(nodes.toPrettyString(), TokenDTO.class);
             logger.info("Token request: {}", tokenDTO);
             tokenService.initiateTokenGeneration(resp, tokenDTO);
 
-        } catch (ValidationException e) {
+        } catch (Exception e) {
             logger.error("Validation error: ", e);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
