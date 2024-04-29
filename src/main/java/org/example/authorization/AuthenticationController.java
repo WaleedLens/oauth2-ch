@@ -10,13 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AuthenticationController extends HttpServlet {
-    private final AuthenticationService service;
+    @Inject
+    private AuthenticationService service;
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationController.class);
 
-    @Inject
-    public AuthenticationController(AuthenticationService service) {
-        this.service = service;
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,9 +26,9 @@ public class AuthenticationController extends HttpServlet {
 
         Authentication authentication = new Authentication(responseType, Long.parseLong(clientId), redirectUri, state, scope);
         // Log the extracted parameters
-        logger.info("Request parameters:{} " , authentication.toString());
+        logger.info("Request parameters:{} ", authentication.toString());
         // Proceed with your method logic
-        service.processAuthentication(authentication,resp);
+        service.processAuthentication(authentication, resp);
 
 
     }

@@ -58,15 +58,13 @@ public class AuthenticationService {
 
     public void storeAuthorizationCode(String authorizationCode, Authentication authentication) {
         try {
-            // Encrypt the authorization code
-            Key key = new SecretKeySpec("encryptionKey123".getBytes(), "AES"); // 16 bytes key
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            byte[] encryptedAuthorizationCode = cipher.doFinal(authorizationCode.getBytes());
-            String encryptedAuthorizationCodeStr = new String(encryptedAuthorizationCode, StandardCharsets.UTF_8);
+
+            // Convert the encrypted byte array to a Base64 encoded string
+            logger.info("Storing authorization code: {}", authorizationCode);
+
             // Create an AuthorizationCode object
             AuthorizationCode code = new AuthorizationCode();
-            code.setCode(encryptedAuthorizationCodeStr);
+            code.setCode(authorizationCode);
             code.setClientId(authentication.getClientId());
             code.setRedirectUri(authentication.getRedirectUri());
             code.setScope(authentication.getScope());

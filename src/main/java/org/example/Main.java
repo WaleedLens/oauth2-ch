@@ -2,13 +2,14 @@ package org.example;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.example.client.ClientController;
 
 public class Main {
-    public static final Injector injectorInstance = Guice.createInjector(new AppInjector());
 
     public static void main(String[] args) {
+        Injector injector = Guice.createInjector();
 
-        WebServer webServer = WebServer.getInstance();
+        WebServer webServer = injector.getInstance(WebServer.class);
         webServer.start();
     }
 }

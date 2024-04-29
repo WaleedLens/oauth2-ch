@@ -9,13 +9,17 @@ import java.io.IOException;
 
 
 public class ClientController extends HttpServlet {
-    private final ClientService service;
+    @Inject
+    private ClientService service;
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(ClientController.class);
 
-    @Inject
-    public ClientController(ClientService service) {
-        this.service = service;
-    }
+    /**
+     * Get all clients
+     *
+     * @param req  request object
+     * @param resp response object
+     * @throws IOException
+     */
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -41,7 +45,7 @@ public class ClientController extends HttpServlet {
         String requestBody = stringBuilder.toString();
 
         logger.info("Request body: " + requestBody);
-        service.save(requestBody);
+        service.save(resp,requestBody);
     }
 
     /**

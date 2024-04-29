@@ -17,15 +17,6 @@ public class AppInjector extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(TokenController.class).to(TokenController.class);
-        bind(ClientController.class).to(ClientController.class);
-        bind(ClientService.class).to(ClientService.class);
-        bind(AuthenticationController.class).to(AuthenticationController.class);
-        bind(AuthenticationService.class).to(AuthenticationService.class);
-        bind(TokenService.class).to(TokenService.class);
-        bind(TokenRepository.class).to(TokenRepository.class);
-        bind(AuthorizationRepository.class).to(AuthorizationRepository.class);
-        bind(ClientRepository.class).to(ClientRepository.class);
-        bind(ClientAuthRepository.class).to(ClientAuthRepository.class);
+
     }
 }

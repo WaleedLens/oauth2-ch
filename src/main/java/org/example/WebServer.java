@@ -6,23 +6,26 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.example.authorization.AuthenticationController;
 import org.example.client.ClientController;
+import org.example.token.TokenController;
 
 import javax.servlet.http.HttpServlet;
 
 public class WebServer {
-    private final static WebServer WEB_SERVER_OBJECT = new WebServer();
+
     org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(WebServer.class);
 
     private ServletContextHandler context;
 
-    @Inject
-    private ClientController clientController;
+
+    private final ClientController clientController;
+    private final AuthenticationController authenticationController;
+    private final TokenController tokenController;
 
     @Inject
-    private AuthenticationController authenticationController;
-
-    public static WebServer getInstance() {
-        return WEB_SERVER_OBJECT;
+    public WebServer(ClientController clientController, AuthenticationController authenticationController, TokenController tokenController) {
+        this.clientController = clientController;
+        this.authenticationController = authenticationController;
+        this.tokenController = tokenController;
     }
 
     public ServletContextHandler getServletContextHandler() {
@@ -42,7 +45,7 @@ public class WebServer {
             // --> servlets <--
             addServlet(clientController, "/client");
             addServlet(authenticationController, "/auth");
-
+            addServlet(tokenController, "/token");
             server.start();
             logger.info("Starting server on port: {}", port);
             server.join();
