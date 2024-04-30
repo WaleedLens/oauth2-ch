@@ -3,6 +3,7 @@ package org.example.utils;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Date;
 import java.util.UUID;
 
 public class OAuthUtils {
@@ -42,6 +43,15 @@ public class OAuthUtils {
     public static String generateAccessToken() {
         SecureRandom secureRandom = new SecureRandom();
         return new BigInteger(130, secureRandom).toString(32);
+    }
+
+    /**
+     * Generate expiration date for the token given seconds.
+     * @param seconds
+     * @return
+     */
+    public static Date getExpirationDate(int seconds) {
+        return new Date(System.currentTimeMillis() + seconds * 1000);
     }
 
 

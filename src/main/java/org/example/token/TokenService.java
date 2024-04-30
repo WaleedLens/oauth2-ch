@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import org.example.authorization.AuthorizationCode;
 import org.example.authorization.AuthorizationRepository;
+import org.example.utils.OAuthUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class TokenService {
     private final TokenRepository tokenRepository;
@@ -40,9 +42,24 @@ public class TokenService {
 
     }
 
-    protected void generateAccessTokens(HttpServletResponse response) {
+    /**
+     * Generates access tokens and saves them in the database.
+     * @param response
+     */
+    private void generateAccessTokens(HttpServletResponse response) {
         log.info("Generating access tokens");
-        // Generate access tokens
+
+        try {
+            Token accessToken = new Token();
+            accessToken.setExpiresIn(3600);
+            accessToken.setAccessToken(OAuthUtils.generateAccessToken());
+            log.info("Generated access token: ", accessToken.toString());
+            tokenRepository.save(accessToken);
+
+            response.getWriter().write(accessToken.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

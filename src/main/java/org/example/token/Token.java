@@ -45,5 +45,11 @@ public class Token implements Identifiable<Long> {
     }
 
 
-
+    @Override
+    public String toString() {
+        return "Token{" +
+                "accessToken='" + accessToken + '\'' +
+                ", expiresIn=" + expiresIn +
+                '}';
+    }
 }
