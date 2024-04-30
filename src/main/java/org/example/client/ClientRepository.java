@@ -40,4 +40,11 @@ public class ClientRepository implements Repository<Client> {
         Table table = queryBuilder.objectToTable(new Client());
         return queryBuilder.findAll(table, Client.class);
     }
+
+    @Override
+    public Client findByField(String field, Object value) {
+        Client c = new Client();
+        Table table = queryBuilder.objectToTable(c);
+        return queryBuilder.findByField(table, Client.class, field, value);
+    }
 }

@@ -41,4 +41,12 @@ public class AuthorizationRepository implements Repository<AuthorizationCode>{
         Table table = queryBuilder.objectToTable(new AuthorizationCode());
         return queryBuilder.findAll(table, AuthorizationCode.class);
     }
+
+    @Override
+    public AuthorizationCode findByField(String field, Object value) {
+        AuthorizationCode authorizationCode = new AuthorizationCode();
+        Table table = queryBuilder.objectToTable(authorizationCode);
+
+        return queryBuilder.findByField(table, AuthorizationCode.class, field, value);
+    }
 }

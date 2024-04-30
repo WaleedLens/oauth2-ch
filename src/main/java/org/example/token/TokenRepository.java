@@ -40,4 +40,9 @@ public class TokenRepository implements Repository<Token> {
         Table table = queryBuilder.objectToTable(new Token());
         return queryBuilder.findAll(table, Token.class);
     }
+
+    @Override
+    public Token findByField(String field, Object value) {
+        return null;
+    }
 }

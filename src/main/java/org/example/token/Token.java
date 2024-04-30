@@ -5,9 +5,10 @@ import org.example.database.Identifiable;
 
 @TableEntity(tableName = "tokens")
 public class Token implements Identifiable<Long> {
+    private Long id;
     private String accessToken;
     private int expiresIn;
-    private Long id;
+
 
     public Token() {
     }
@@ -42,4 +43,7 @@ public class Token implements Identifiable<Long> {
     public void setId(Long id) {
 
     }
+
+
+
 }

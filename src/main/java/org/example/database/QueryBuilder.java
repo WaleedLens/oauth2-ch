@@ -31,7 +31,9 @@ public class QueryBuilder {
 
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);  // Make private fields accessible
+              // Get the value of the field (if it exists
             try {
+
                 logger.info("Field name: {} Field value: {}", ColumnConverter.memberToColumn(field.getName()), field.get(object));
                 fieldNames.add(ColumnConverter.memberToColumn(field.getName()));
                 fieldValues.add(field.get(object));
@@ -39,8 +41,8 @@ public class QueryBuilder {
                 e.printStackTrace();
             }
         }
-        Table table = new Table(fieldNames, fieldValues, tableName);
-        return table;
+
+        return new Table(fieldNames, fieldValues, tableName);
     }
 
     public <T> T resultSetToObject(ResultSet resultSet, Class<T> clazz) throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, SQLException {
@@ -193,6 +195,25 @@ public class QueryBuilder {
         }
         return null;
     }
+
+
+    public <T> T findByField(Table table, Class<T> clazz,String field,Object value) {
+        String className = ClassFinder.findClassName(table.getName());
+        try {
+            Class<?> tableClass = Class.forName(className);
+            TableEntity tableEntity = tableClass.getAnnotation(TableEntity.class);
+            String statement = buildSelectStatement(tableEntity.tableName(), field, value);
+            List<T> results = connector.executeQuery(statement, clazz);
+            logger.info("Found object in table: {}", table.getName());
+
+            return results.get(0);
+        } catch (ClassNotFoundException e) {
+            logger.error("Error finding object in table: {}", table.getName());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public <T> List<T> findAll(Table table, Class<T> clazz) {
         String className = ClassFinder.findClassName(table.getName());

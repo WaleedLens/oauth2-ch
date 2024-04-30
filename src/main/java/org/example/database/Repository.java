@@ -8,4 +8,5 @@ public interface Repository<T> {
     long update(T object);
     T find(Long id);
     List<T> findAll();
+    T findByField(String field,Object value);
 }

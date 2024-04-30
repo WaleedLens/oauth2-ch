@@ -27,14 +27,14 @@ public class TokenService {
     public void initiateTokenGeneration(HttpServletResponse response, TokenDTO dto) {
         if (validateRequestParams(dto)) {
             generateAccessTokens(response);
-        }else{
+        } else {
             log.info("Invalid request parameters");
         }
     }
 
     public boolean validateRequestParams(TokenDTO tokenDTO) {
 
-        AuthorizationCode authorizationCode = authorizationRepository.find(Long.valueOf(tokenDTO.getClientId()));
+        AuthorizationCode authorizationCode = authorizationRepository.findByField("client_id", Long.valueOf(tokenDTO.getClientId()));
         log.info("Validating request parameters ", tokenDTO.toString(), " -- ", authorizationCode.toString());
         return authorizationCode.equals(tokenDTO);
 
@@ -43,6 +43,7 @@ public class TokenService {
     protected void generateAccessTokens(HttpServletResponse response) {
         log.info("Generating access tokens");
         // Generate access tokens
+
     }
 
 

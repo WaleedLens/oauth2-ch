@@ -80,7 +80,7 @@ public class AuthorizationCode implements Identifiable<Long> {
 
     @Override
     public void setId(Long id) {
-
+        this.id = id;
     }
 
     @Override

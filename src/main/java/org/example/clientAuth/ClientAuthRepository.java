@@ -40,4 +40,10 @@ public class ClientAuthRepository implements Repository<ClientAuth> {
         Table table = queryBuilder.objectToTable(new ClientAuth());
         return queryBuilder.findAll(table, ClientAuth.class);
     }
+
+    @Override
+    public ClientAuth findByField(String field, Object value) {
+
+        return null;
+    }
 }
