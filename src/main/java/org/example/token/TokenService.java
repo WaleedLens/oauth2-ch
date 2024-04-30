@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
 import org.example.authorization.AuthorizationCode;
 import org.example.authorization.AuthorizationRepository;
+import org.example.utils.JsonHandler;
 import org.example.utils.OAuthUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -55,8 +56,8 @@ public class TokenService {
             accessToken.setAccessToken(OAuthUtils.generateAccessToken());
             log.info("Generated access token: ", accessToken.toString());
             tokenRepository.save(accessToken);
-
-            response.getWriter().write(accessToken.toString());
+            String jsonResponse = JsonHandler.toJson(accessToken);
+            response.getWriter().write(jsonResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
