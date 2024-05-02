@@ -54,5 +54,18 @@ public class OAuthUtils {
         return new Date(System.currentTimeMillis() + seconds * 1000);
     }
 
+    /**
+     * Generate a random authorization code
+     *
+     * @return String
+     */
+    public static String generateAuthorizationCode() {
+        // Generate a secure random authorization code
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] code = new byte[20];
+        secureRandom.nextBytes(code);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(code);
+    }
+
 
 }

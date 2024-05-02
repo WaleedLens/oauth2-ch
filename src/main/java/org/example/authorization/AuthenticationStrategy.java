@@ -7,19 +7,17 @@ import org.example.client.ClientRepository;
 import org.example.utils.OAuthUtils;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import java.util.Date;
 
-public class AuthenticationService {
+public abstract class AuthenticationStrategy {
     private final ClientRepository repository;
     private final AuthorizationRepository authorizationCodeRepository;
     private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationService.class);
 
+    protected String authorizationCode;
+
     @Inject
-    public AuthenticationService(ClientRepository repository, AuthorizationRepository authorizationCodeRepository) {
+    public AuthenticationStrategy(ClientRepository repository, AuthorizationRepository authorizationCodeRepository) {
         this.repository = repository;
         this.authorizationCodeRepository = authorizationCodeRepository;
     }
@@ -28,21 +26,21 @@ public class AuthenticationService {
 
         // Validate the authentication
         if (validateAuthentication(authentication)) {
-            // Generate an authorization code
-            String authorizationCode = OAuthUtils.generateAuthorizationCode();
 
+            // Generate an authorization code
+            this.authorizationCode = OAuthUtils.generateAuthorizationCode();
             // Store the authorization code
-            storeAuthorizationCode(authorizationCode, authentication);
+            storeAuthorizationCode(authentication);
 
             // Redirect the user agent
-            redirectUserAgent(authorizationCode, authentication, resp);
+            redirectUserAgent(authentication, resp);
 
             logger.info("Processing authentication for client: {}", authentication.getClientId());
         }
     }
 
 
-    public void storeAuthorizationCode(String authorizationCode, Authentication authentication) {
+    public void storeAuthorizationCode(Authentication authentication) {
         try {
 
             // Convert the encrypted byte array to a Base64 encoded string
@@ -64,24 +62,6 @@ public class AuthenticationService {
         }
     }
 
-    public void redirectUserAgent(String authorizationCode, Authentication authentication, HttpServletResponse resp) {
-        try {
-            String redirectUri = authentication.getRedirectUri();
-            String state = authentication.getState();
-
-            StringBuilder sb = new StringBuilder(redirectUri);
-            sb.append("?code=").append(URLEncoder.encode(authorizationCode, StandardCharsets.UTF_8));
-
-            if (state != null) {
-                sb.append("&state=").append(URLEncoder.encode(state, StandardCharsets.UTF_8));
-            }
-            logger.info("Redirecting user agent to: {}", sb.toString());
-            resp.sendRedirect(sb.toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Error redirecting user agent", e);
-        }
-    }
-
     private boolean validateAuthentication(Authentication authentication) {
         Client client = repository.find(authentication.getClientId());
         if (client == null) {
@@ -96,5 +76,5 @@ public class AuthenticationService {
         return true;
     }
 
-
+    public abstract void redirectUserAgent(Authentication authentication, HttpServletResponse resp);
 }

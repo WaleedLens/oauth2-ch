@@ -11,7 +11,10 @@ import java.io.IOException;
 
 public class AuthenticationController extends HttpServlet {
     @Inject
-    private AuthenticationService service;
+    private ClientAuthenticationStrategy clientStrategy;
+
+    @Inject
+    private ServerAuthenticationStrategy serverStrategy;
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationController.class);
 
 
@@ -28,7 +31,15 @@ public class AuthenticationController extends HttpServlet {
         // Log the extracted parameters
         logger.info("Request parameters:{} ", authentication.toString());
         // Proceed with your method logic
-        service.processAuthentication(authentication, resp);
+        if (authentication.getResponseType().equals(ResponseType.CODE.toString())) {
+            serverStrategy.processAuthentication(authentication, resp);
+        } else if (authentication.getResponseType().equals(ResponseType.TOKEN.toString())) {
+            clientStrategy.processAuthentication(authentication, resp);
+        } else {
+            logger.error("Invalid response type: {}", authentication.getResponseType());
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid response type");
+
+        }
 
 
     }

@@ -12,4 +12,5 @@ public class Main {
         WebServer webServer = injector.getInstance(WebServer.class);
         webServer.start();
     }
+
 }
