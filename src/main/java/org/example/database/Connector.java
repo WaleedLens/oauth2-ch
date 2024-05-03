@@ -22,10 +22,7 @@ public class Connector {
         config.setJdbcUrl(AppConfig.getDbHost());
         config.setUsername(AppConfig.getDbUsername());
         config.setPassword(AppConfig.getDbPassword());
-        logger.info("Connecting to database: " + AppConfig.getDbHost());
-        logger.info("Using username: " + AppConfig.getDbUsername());
-        logger.info("Using password: " + AppConfig.getDbPassword());
-        config.setDataSource(new PGSimpleDataSource());
+        config.setDriverClassName("org.postgresql.Driver");
         dataSource = new HikariDataSource(config);
     }
 
