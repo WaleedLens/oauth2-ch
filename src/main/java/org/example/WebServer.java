@@ -8,6 +8,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.example.authorization.AuthenticationController;
 import org.example.client.ClientController;
 import org.example.filters.AuthenticationSecurityFilter;
+import org.example.filters.TokenValidationFilter;
 import org.example.token.TokenController;
 
 import javax.servlet.DispatcherType;
@@ -31,6 +32,8 @@ public class WebServer {
     // >-- filters <--
     @Inject
     private AuthenticationSecurityFilter authenticationFilter;
+    @Inject
+    private TokenValidationFilter tokenValidationFilter;
 
     public ServletContextHandler getServletContextHandler() {
         if (context == null) {
@@ -47,6 +50,7 @@ public class WebServer {
             server.setHandler(getServletContextHandler());
             // --> filters <--
             addFilter(authenticationFilter, "/auth");
+            addFilter(tokenValidationFilter, "/token");
             // --> servlets <--
             addServlet(clientController, "/client");
             addServlet(authenticationController, "/auth");
@@ -69,7 +73,7 @@ public class WebServer {
 
     private void addFilter(Filter filter, String path) {
         logger.info("Adding filter: {} at path: {}", filter.getClass().getName(), path);
-        getServletContextHandler().addFilter(new FilterHolder(filter), path, EnumSet.of(DispatcherType.REQUEST) );
+        getServletContextHandler().addFilter(new FilterHolder(filter), path, EnumSet.of(DispatcherType.REQUEST));
     }
 
 }
