@@ -33,6 +33,7 @@ public class AuthenticationController extends HttpServlet {
         }
 
         logger.info("Finished doGet method");
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     private Authentication extractParameters(HttpServletRequest req) {

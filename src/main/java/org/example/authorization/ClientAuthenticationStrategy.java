@@ -1,5 +1,6 @@
 package org.example.authorization;
 
+import com.google.inject.Inject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.Logger;
 import org.example.client.ClientRepository;
@@ -13,7 +14,7 @@ import java.net.URISyntaxException;
 
 public class ClientAuthenticationStrategy extends AuthenticationStrategy {
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(ClientAuthenticationStrategy.class);
-
+    @Inject
     public ClientAuthenticationStrategy(ClientRepository repository, AuthorizationRepository authorizationCodeRepository) {
         super(repository, authorizationCodeRepository);
     }

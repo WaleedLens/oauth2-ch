@@ -12,7 +12,7 @@ import java.util.Date;
 public abstract class AuthenticationStrategy {
     private final ClientRepository repository;
     private final AuthorizationRepository authorizationCodeRepository;
-    private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationService.class);
+    private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthenticationStrategy.class);
 
     protected String authorizationCode;
 
