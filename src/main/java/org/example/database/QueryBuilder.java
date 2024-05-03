@@ -1,5 +1,6 @@
 package org.example.database;
 
+import org.example.exception.DatabaseException;
 import org.example.utils.ClassFinder;
 import org.example.annotations.TableEntity;
 import org.example.utils.ColumnConverter;
@@ -9,8 +10,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueryBuilder {
     private final static QueryBuilder instance = new QueryBuilder();
@@ -31,7 +34,7 @@ public class QueryBuilder {
 
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);  // Make private fields accessible
-              // Get the value of the field (if it exists
+            // Get the value of the field (if it exists
             try {
 
                 logger.info("Field name: {} Field value: {}", ColumnConverter.memberToColumn(field.getName()), field.get(object));
@@ -133,16 +136,15 @@ public class QueryBuilder {
         try {
             Class<?> clazz = Class.forName(className);
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
-            String statement = buildInsertStatement(tableEntity.tableName(), table.getFields(), table.getValues());
-            long id = connector.executeUpdate(statement);
+            String statement = "INSERT INTO " + tableEntity.tableName() + " (" + String.join(", ", table.getFields()) + ") VALUES (" + generatePlaceholders(table.getValues().size()) + ");";
+            long id = connector.executeUpdateWithGeneratedKey(statement, table.getValues().toArray());
             logger.info("Inserted object into table: {}ID: {}", table.getName(), id);
 
             return id;
         } catch (ClassNotFoundException e) {
             logger.error("Error inserting object into table: {}", table.getName());
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
-        return -1;
     }
 
     public long delete(Table table) {
@@ -150,16 +152,15 @@ public class QueryBuilder {
         try {
             Class<?> clazz = Class.forName(className);
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
-            String statement = buildDeleteStatement(tableEntity.tableName(), table.getFields().get(0), table.getValues().get(0));
-            long id = connector.executeUpdate(statement);
+            String statement = "DELETE FROM " + tableEntity.tableName() + " WHERE " + table.getFields().get(0) + " = ?;";
+            long id = connector.executeUpdate(statement, table.getValues().get(0));
             logger.info("Deleted object from table: {}ID: {}", table.getName(), id);
 
             return id;
         } catch (ClassNotFoundException e) {
             logger.error("Error deleting object from table: {}", table.getName());
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
-        return -1;
     }
 
     public long update(Table table) {
@@ -167,16 +168,17 @@ public class QueryBuilder {
         try {
             Class<?> clazz = Class.forName(className);
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
-            String statement = buildUpdateStatement(tableEntity.tableName(), table.getFields(), table.getValues(), table.getFields().get(0), table.getValues().get(0));
-            long id = connector.executeUpdate(statement);
+            String statement = "UPDATE " + tableEntity.tableName() + " SET " + generateSetClause(table.getFields()) + " WHERE " + table.getFields().get(0) + " = ?;";
+            List<Object> params = new ArrayList<>(table.getValues());
+            params.add(table.getValues().get(0)); // add the ID value at the end
+            long id = connector.executeUpdate(statement, params.toArray());
             logger.info("Updated object in table: {}ID: {}", table.getName(), id);
 
             return id;
         } catch (ClassNotFoundException e) {
             logger.error("Error updating object in table: {}", table.getName());
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
-        return -1;
     }
 
     public <T> T find(Table table, Class<T> clazz) {
@@ -184,36 +186,32 @@ public class QueryBuilder {
         try {
             Class<?> tableClass = Class.forName(className);
             TableEntity tableEntity = tableClass.getAnnotation(TableEntity.class);
-            String statement = buildSelectStatement(tableEntity.tableName(), table.getFields().get(0), table.getValues().get(0));
-            List<T> results = connector.executeQuery(statement, clazz);
+            String statement = "SELECT * FROM " + tableEntity.tableName() + " WHERE " + table.getFields().get(0) + " = ?;";
+            List<T> results = connector.executeQuery(statement, clazz, table.getValues().get(0));
             logger.info("Found object in table: {}", table.getName());
 
             return results.get(0);
         } catch (ClassNotFoundException e) {
             logger.error("Error finding object in table: {}", table.getName());
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
-        return null;
     }
 
-
-    public <T> T findByField(Table table, Class<T> clazz,String field,Object value) {
+    public <T> T findByField(Table table, Class<T> clazz, String field, Object value) {
         String className = ClassFinder.findClassName(table.getName());
         try {
             Class<?> tableClass = Class.forName(className);
             TableEntity tableEntity = tableClass.getAnnotation(TableEntity.class);
-            String statement = buildSelectStatement(tableEntity.tableName(), field, value);
-            List<T> results = connector.executeQuery(statement, clazz);
+            String statement = "SELECT * FROM " + tableEntity.tableName() + " WHERE " + field + " = ?;";
+            List<T> results = connector.executeQuery(statement, clazz, value);
             logger.info("Found object in table: {}", table.getName());
 
             return results.get(0);
         } catch (ClassNotFoundException e) {
             logger.error("Error finding object in table: {}", table.getName());
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
-        return null;
     }
-
 
     public <T> List<T> findAll(Table table, Class<T> clazz) {
         String className = ClassFinder.findClassName(table.getName());
@@ -227,8 +225,15 @@ public class QueryBuilder {
             return results;
         } catch (ClassNotFoundException e) {
             logger.error("Error finding all objects in table: " + table.getName());
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
-        return null;
+    }
+
+    private String generatePlaceholders(int count) {
+        return String.join(", ", Collections.nCopies(count, "?"));
+    }
+
+    private String generateSetClause(List<String> fields) {
+        return fields.stream().map(field -> field + " = ?").collect(Collectors.joining(", "));
     }
 }

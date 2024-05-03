@@ -1,34 +1,49 @@
 package org.example.database;
 
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.example.AppConfig;
+import org.example.exception.DatabaseException;
+import org.postgresql.ds.PGSimpleDataSource;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Connector {
-    private final static Connector CONNECTOR = new Connector();
+    private static final Connector CONNECTOR = new Connector();
+    private final HikariDataSource dataSource;
     org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(Connector.class);
+
+    private Connector() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(AppConfig.getDbHost());
+        config.setUsername(AppConfig.getDbUsername());
+        config.setPassword(AppConfig.getDbPassword());
+        config.setDataSource(new PGSimpleDataSource());
+        dataSource = new HikariDataSource(config);
+    }
 
     public static Connector getInstance() {
         return CONNECTOR;
     }
 
     private Connection getConnection() throws SQLException {
-        String dbUrl = System.getenv("db_host");
-        String user = System.getenv("db_username");
-        String password = System.getenv("db_password");
-
-        logger.info("Connecting to database with url: {}", dbUrl);
-
-        return DriverManager.getConnection(dbUrl, user, password);
+        return dataSource.getConnection();
     }
 
-    public <T> List<T> executeQuery(String query, Class<T> clazz) {
+    public <T> List<T> executeQuery(String query, Class<T> clazz, Object... params) {
         List<T> results = new ArrayList<>();
-        try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+
+            ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 T object = QueryBuilder.getInstance().resultSetToObject(resultSet, clazz);
@@ -38,18 +53,23 @@ public class Connector {
             return results;
         } catch (SQLException | IllegalAccessException | InstantiationException | NoSuchFieldException e) {
             logger.error("Error executing query: " + query, e);
-            throw new RuntimeException(e);
+            throw new DatabaseException(e);
         }
     }
 
-    public long executeUpdate(String query) {
+    public long executeUpdateWithGeneratedKey(String query, Object... params) {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
 
             int affectedRows = statement.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new SQLException("Executing update failed, no rows affected.");
+                logger.error("Executing update failed, no rows affected.");
+                throw new DatabaseException("Executing update failed, no rows affected.");
             }
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -61,9 +81,30 @@ public class Connector {
             }
         } catch (SQLException e) {
             logger.error("Error executing update: " + query, e);
-            throw new RuntimeException(e);
+            throw new DatabaseException(e);
         }
     }
 
+    public int executeUpdate(String query, Object... params) {
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                logger.error("Executing update failed, no rows affected.");
+                throw new DatabaseException("Executing update failed, no rows affected.");
+            }
+
+            return affectedRows;
+        } catch (SQLException e) {
+            logger.error("Error executing update: " + query, e);
+            throw new DatabaseException(e);
+        }
+    }
 
 }
