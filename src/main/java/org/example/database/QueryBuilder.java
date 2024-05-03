@@ -25,20 +25,30 @@ public class QueryBuilder {
     }
 
     public Table objectToTable(Identifiable object) {
-
+        // Get the stack trace of the current thread
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        String callingMethodName = stackTraceElements[2].getMethodName();
+        logger.info("Calling method: {}", callingMethodName);
         Class<?> clazz = object.getClass();
         String tableName = clazz.getSimpleName();  // Using class name as table name
+
 
         List<String> fieldNames = new ArrayList<>();
         List<Object> fieldValues = new ArrayList<>();
 
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);  // Make private fields accessible
-            // Get the value of the field (if it exists
-            try {
+            String fieldName = field.getName();
 
-                logger.info("Field name: {} Field value: {}", ColumnConverter.memberToColumn(field.getName()), field.get(object));
-                fieldNames.add(ColumnConverter.memberToColumn(field.getName()));
+            // Skip id, createdAt, and updatedAt fields for insert operations
+            if (callingMethodName.equals("save") && (fieldName.equals("id") || fieldName.equals("createdAt") || fieldName.equals("updatedAt"))) {
+                continue;
+            }
+
+            // Get the value of the field (if it exists)
+            try {
+                logger.info("Field name: {} Field value: {}", ColumnConverter.memberToColumn(fieldName), field.get(object));
+                fieldNames.add(ColumnConverter.memberToColumn(fieldName));
                 fieldValues.add(field.get(object));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -66,69 +76,6 @@ public class QueryBuilder {
         return instance;
     }
 
-    private String buildDeleteStatement(String tableName, String idField, Object idValue) {
-        String statement = "DELETE FROM " + tableName + " WHERE " + idField + " = '" + idValue.toString().replace("'", "''") + "';";
-        logger.info("Generated delete statement: {}", statement);
-        return statement;
-    }
-
-    private String buildUpdateStatement(String tableName, List<String> fieldNames, List<Object> fieldValues, String idField, Object idValue) {
-        StringBuilder fields = new StringBuilder();
-        StringBuilder values = new StringBuilder();
-
-        for (int i = 0; i < fieldNames.size(); i++) {
-            if (fieldValues.get(i) == null || fieldValues.get(i).toString().equals(" ")) {
-                continue;
-            }
-
-            fields.append(fieldNames.get(i)).append(", ");
-            values.append("'").append(fieldValues.get(i).toString().replace("'", "''")).append("', ");
-        }
-
-        // Correctly remove the last comma and space if necessary
-        if (!fields.isEmpty()) {
-            fields.setLength(fields.length() - 2); // removes the last ", "
-        }
-        if (!values.isEmpty()) {
-            values.setLength(values.length() - 2); // removes the last ", "
-        }
-
-        String statement = "UPDATE " + tableName + " SET " + fields.toString() + " WHERE " + idField + " = '" + idValue.toString().replace("'", "''") + "';";
-        logger.info("Generated update statement: " + statement);
-        return statement;
-    }
-
-    private String buildInsertStatement(String tableName, List<String> fieldNames, List<Object> fieldValues) {
-        StringBuilder fields = new StringBuilder();
-        StringBuilder values = new StringBuilder();
-
-        for (int i = 0; i < fieldNames.size(); i++) {
-            if (fieldValues.get(i) == null || fieldValues.get(i).toString().equals(" ")) {
-                continue;
-            }
-
-            fields.append(fieldNames.get(i)).append(", ");
-            values.append("'").append(fieldValues.get(i).toString().replace("'", "''")).append("', ");
-        }
-
-        // Correctly remove the last comma and space if necessary
-        if (!fields.isEmpty()) {
-            fields.setLength(fields.length() - 2); // removes the last ", "
-        }
-        if (!values.isEmpty()) {
-            values.setLength(values.length() - 2); // removes the last ", "
-        }
-
-        String statement = "INSERT INTO " + tableName + " (" + fields.toString() + ") VALUES (" + values.toString() + ");";
-        logger.info("Generated insert statement: {}", statement);
-        return statement;
-    }
-
-    private String buildSelectStatement(String tableName, String idField, Object idValue) {
-        String statement = "SELECT * FROM " + tableName + " WHERE " + idField + " = '" + idValue.toString().replace("'", "''") + "';";
-        logger.info("Generated select statement: {}", statement);
-        return statement;
-    }
 
     public long insert(Table table) {
         String className = ClassFinder.findClassName(table.getName());
@@ -136,6 +83,7 @@ public class QueryBuilder {
         try {
             Class<?> clazz = Class.forName(className);
             TableEntity tableEntity = clazz.getAnnotation(TableEntity.class);
+
             String statement = "INSERT INTO " + tableEntity.tableName() + " (" + String.join(", ", table.getFields()) + ") VALUES (" + generatePlaceholders(table.getValues().size()) + ");";
             long id = connector.executeUpdateWithGeneratedKey(statement, table.getValues().toArray());
             logger.info("Inserted object into table: {}ID: {}", table.getName(), id);
