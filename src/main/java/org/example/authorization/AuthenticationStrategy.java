@@ -24,19 +24,16 @@ public abstract class AuthenticationStrategy {
 
     public void processAuthentication(Authentication authentication, HttpServletResponse resp) {
 
-        // Validate the authentication
-        if (validateAuthentication(authentication)) {
+        // Generate an authorization code
+        this.authorizationCode = OAuthUtils.generateAuthorizationCode();
+        // Store the authorization code
+        storeAuthorizationCode(authentication);
 
-            // Generate an authorization code
-            this.authorizationCode = OAuthUtils.generateAuthorizationCode();
-            // Store the authorization code
-            storeAuthorizationCode(authentication);
+        // Redirect the user agent
+        redirectUserAgent(authentication, resp);
 
-            // Redirect the user agent
-            redirectUserAgent(authentication, resp);
+        logger.info("Processing authentication for client: {}", authentication.getClientId());
 
-            logger.info("Processing authentication for client: {}", authentication.getClientId());
-        }
     }
 
 
@@ -62,19 +59,6 @@ public abstract class AuthenticationStrategy {
         }
     }
 
-    private boolean validateAuthentication(Authentication authentication) {
-        Client client = repository.find(authentication.getClientId());
-        if (client == null) {
-            throw new IllegalArgumentException("Invalid client id");
-        }
-
-        // Validate the redirect URI
-        if (!client.getRedirectUri().equals(authentication.getRedirectUri())) {
-            throw new IllegalArgumentException("Invalid redirect URI");
-        }
-
-        return true;
-    }
 
     public abstract void redirectUserAgent(Authentication authentication, HttpServletResponse resp);
 }

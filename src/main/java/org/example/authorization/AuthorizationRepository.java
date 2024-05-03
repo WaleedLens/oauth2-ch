@@ -1,13 +1,12 @@
 package org.example.authorization;
 
-import org.example.client.Client;
 import org.example.database.QueryBuilder;
 import org.example.database.Repository;
 import org.example.database.Table;
 
 import java.util.List;
 
-public class AuthorizationRepository implements Repository<AuthorizationCode>{
+public class AuthorizationRepository implements Repository<AuthorizationCode> {
     private final QueryBuilder queryBuilder = QueryBuilder.getInstance();
 
     @Override

@@ -2,31 +2,35 @@ package org.example;
 
 import com.google.inject.Inject;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.example.authorization.AuthenticationController;
 import org.example.client.ClientController;
+import org.example.filters.AuthenticationSecurityFilter;
 import org.example.token.TokenController;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServlet;
+import java.util.EnumSet;
 
 public class WebServer {
 
     org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(WebServer.class);
 
     private ServletContextHandler context;
-
-
-    private final ClientController clientController;
-    private final AuthenticationController authenticationController;
-    private final TokenController tokenController;
-
+    // >-- controllers <--
     @Inject
-    public WebServer(ClientController clientController, AuthenticationController authenticationController, TokenController tokenController) {
-        this.clientController = clientController;
-        this.authenticationController = authenticationController;
-        this.tokenController = tokenController;
-    }
+    private ClientController clientController;
+    @Inject
+    private AuthenticationController authenticationController;
+    @Inject
+    private TokenController tokenController;
+
+    // >-- filters <--
+    @Inject
+    private AuthenticationSecurityFilter authenticationFilter;
 
     public ServletContextHandler getServletContextHandler() {
         if (context == null) {
@@ -41,7 +45,8 @@ public class WebServer {
             int port = 8432;
             Server server = new Server(port);
             server.setHandler(getServletContextHandler());
-
+            // --> filters <--
+            addFilter(authenticationFilter, "/auth");
             // --> servlets <--
             addServlet(clientController, "/client");
             addServlet(authenticationController, "/auth");
@@ -57,8 +62,14 @@ public class WebServer {
 
     }
 
-    public void addServlet(HttpServlet servlet, String path) {
+    private void addServlet(HttpServlet servlet, String path) {
         logger.info("Adding servlet: {} at path: {}", servlet.getClass().getName(), path);
         getServletContextHandler().addServlet(new ServletHolder(servlet), path);
     }
+
+    private void addFilter(Filter filter, String path) {
+        logger.info("Adding filter: {} at path: {}", filter.getClass().getName(), path);
+        getServletContextHandler().addFilter(new FilterHolder(filter), path, EnumSet.of(DispatcherType.REQUEST) );
+    }
+
 }

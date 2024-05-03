@@ -22,7 +22,8 @@ public class AuthenticationController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.info("Starting doGet method");
-        Authentication authentication = extractParameters(req);
+
+        Authentication authentication = (Authentication) req.getAttribute("authentication");
         logger.info("Request parameters: {}", authentication.toString());
 
         try {
@@ -36,15 +37,6 @@ public class AuthenticationController extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
-    private Authentication extractParameters(HttpServletRequest req) {
-        String responseType = req.getParameter("response_type");
-        String clientId = req.getParameter("client_id");
-        String redirectUri = req.getParameter("redirect_uri");
-        String scope = req.getParameter("scope");
-        String state = req.getParameter("state");
-
-        return new Authentication(responseType, Long.parseLong(clientId), redirectUri, state, scope);
-    }
 
     private void processRequest(Authentication authentication, HttpServletResponse resp) throws InvalidResponseTypeException {
         if (authentication.getResponseType().equals(ResponseType.CODE.toString())) {
