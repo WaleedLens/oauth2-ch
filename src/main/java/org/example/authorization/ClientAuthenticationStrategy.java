@@ -1,38 +1,46 @@
 package org.example.authorization;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.Logger;
 import org.example.client.ClientRepository;
+import org.example.exception.RedirectException;
 import org.example.utils.OAuthUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
 
-public class ClientAuthenticationStrategy  extends AuthenticationStrategy{
+
+public class ClientAuthenticationStrategy extends AuthenticationStrategy {
     Logger logger = org.apache.logging.log4j.LogManager.getLogger(ClientAuthenticationStrategy.class);
+
     public ClientAuthenticationStrategy(ClientRepository repository, AuthorizationRepository authorizationCodeRepository) {
         super(repository, authorizationCodeRepository);
     }
 
     @Override
-    public void redirectUserAgent( Authentication authentication, HttpServletResponse resp) {
+    public void redirectUserAgent(Authentication authentication, HttpServletResponse resp) {
+        logger.info("Starting redirectUserAgent method");
+
         try {
-            String redirectUri = authentication.getRedirectUri();
-            String state = authentication.getState();
-
-            StringBuilder sb = new StringBuilder(redirectUri);
-            sb.append("/callback");
-            sb.append("?access_token=").append(OAuthUtils.generateAccessToken());
-
-            if (state != null) {
-                sb.append("&state=").append(URLEncoder.encode(state, StandardCharsets.UTF_8));
+            URIBuilder uriBuilder = new URIBuilder(authentication.getRedirectUri());
+            uriBuilder.setPath("/callback");
+            uriBuilder.addParameter("access_token", OAuthUtils.generateAccessToken());
+            uriBuilder.addParameter("token_type", "Bearer");
+            uriBuilder.addParameter("expires_in", "3600");
+            if (authentication.getState() != null) {
+                uriBuilder.addParameter("state", authentication.getState());
             }
-            logger.info("Redirecting user agent to: {}", sb.toString());
-            resp.sendRedirect(sb.toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Error redirecting user agent", e);
+
+            String redirectUrl = uriBuilder.build().toString();
+            logger.info("Redirecting user agent to: {}", redirectUrl);
+            resp.sendRedirect(redirectUrl);
+        } catch (IOException | URISyntaxException e) {
+            logger.error("Error redirecting user agent", e);
+            throw new RedirectException("Error redirecting user agent", e);
         }
+
+        logger.info("Finished redirectUserAgent method");
     }
 
 }

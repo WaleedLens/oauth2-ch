@@ -2,6 +2,7 @@ package org.example.authorization;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
+import org.example.exception.InvalidResponseTypeException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,33 +21,38 @@ public class AuthenticationController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Extract query parameters directly using HttpServletRequest's methods
+        logger.info("Starting doGet method");
+        Authentication authentication = extractParameters(req);
+        logger.info("Request parameters: {}", authentication.toString());
+
+        try {
+            processRequest(authentication, resp);
+        } catch (InvalidResponseTypeException e) {
+            logger.error("Invalid response type: {}", authentication.getResponseType());
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid response type");
+        }
+
+        logger.info("Finished doGet method");
+    }
+
+    private Authentication extractParameters(HttpServletRequest req) {
         String responseType = req.getParameter("response_type");
         String clientId = req.getParameter("client_id");
         String redirectUri = req.getParameter("redirect_uri");
         String scope = req.getParameter("scope");
         String state = req.getParameter("state");
 
-        Authentication authentication = new Authentication(responseType, Long.parseLong(clientId), redirectUri, state, scope);
-        // Log the extracted parameters
-        logger.info("Request parameters:{} ", authentication.toString());
-        // Proceed with your method logic
+        return new Authentication(responseType, Long.parseLong(clientId), redirectUri, state, scope);
+    }
+
+    private void processRequest(Authentication authentication, HttpServletResponse resp) throws InvalidResponseTypeException {
         if (authentication.getResponseType().equals(ResponseType.CODE.toString())) {
             serverStrategy.processAuthentication(authentication, resp);
         } else if (authentication.getResponseType().equals(ResponseType.TOKEN.toString())) {
             clientStrategy.processAuthentication(authentication, resp);
         } else {
-            logger.error("Invalid response type: {}", authentication.getResponseType());
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid response type");
-
+            throw new InvalidResponseTypeException("Invalid response type");
         }
-
-
     }
 
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
-    }
 }
