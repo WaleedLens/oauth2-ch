@@ -1,5 +1,7 @@
 package org.example.database;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.exception.DatabaseException;
 import org.example.utils.ClassFinder;
 import org.example.annotations.TableEntity;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class QueryBuilder {
     private final static QueryBuilder instance = new QueryBuilder();
-    private org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(QueryBuilder.class);
+    Logger logger = LogManager.getLogger(QueryBuilder.class);
     private Connector connector = Connector.getInstance();
 
     public static QueryBuilder getInstance() {
@@ -51,7 +53,8 @@ public class QueryBuilder {
                 fieldNames.add(ColumnConverter.memberToColumn(fieldName));
                 fieldValues.add(field.get(object));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("Error accessing field '{}' of object '{}': {}", fieldName, object, e.getMessage());
+                throw new DatabaseException(e);
             }
         }
 
