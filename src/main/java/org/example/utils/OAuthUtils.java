@@ -68,4 +68,18 @@ public class OAuthUtils {
     }
 
 
+    /**
+     * This method generates a unique refresh token for OAuth 2.0 authentication.
+     * It creates a new BigInteger instance with a bit length of 160 using a SecureRandom object as the source of randomness.
+     * The bit length of 160 ensures the uniqueness of the generated refresh token.
+     * The BigInteger value is then converted to a string representation in base 32, resulting in a URL-safe string.
+     *
+     * @return A unique, URL-safe refresh token.
+     */
+    public static String generateRefreshToken() {
+        SecureRandom secureRandom = new SecureRandom();
+        return new BigInteger(160, secureRandom).toString(32);
+    }
+
+
 }

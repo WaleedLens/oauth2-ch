@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.exception.ValidationException;
+import org.example.token.GrantType;
 import org.example.token.TokenDTO;
 import org.example.utils.JsonHandler;
 import org.example.validation.TokenValidator;
@@ -28,6 +29,10 @@ public class TokenValidationFilter implements Filter {
         try {
             JsonNode nodes = JsonHandler.readTree(httpRequest.getReader());
             tokenValidator.validate(nodes);
+            if (nodes.get("grant_type").equals(GrantType.refresh_token.toString()))
+                tokenValidator.validateRefreshToken(nodes);
+
+
             logger.info("Token request is valid");
 
             TokenDTO tokenDTO = (TokenDTO) JsonHandler.toObject(nodes.toPrettyString(), TokenDTO.class);
@@ -39,9 +44,12 @@ public class TokenValidationFilter implements Filter {
         }
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) {}
 
     @Override
-    public void destroy() {}
+    public void init(FilterConfig filterConfig) {
+    }
+
+    @Override
+    public void destroy() {
+    }
 }

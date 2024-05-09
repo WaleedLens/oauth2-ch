@@ -22,6 +22,15 @@ public class TokenValidator implements Validator<JsonNode> {
         validateClientSecret(jsonNode);
     }
 
+    /**
+     * Verifying that the refresh token exists in your database.
+     * Checking that it has not been revoked or expired.
+     * Ensuring that the client_id associated with the request matches the client_id that was used to obtain the refresh token.
+     */
+    public void validateRefreshToken(JsonNode node){
+
+    }
+
     private void validateGrantType(JsonNode node) throws ValidationException {
         if (node.get("grant_type") == null) {
             throw new ValidationException("grant_type is missing");

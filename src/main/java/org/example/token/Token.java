@@ -7,6 +7,7 @@ import org.example.database.Identifiable;
 public class Token implements Identifiable<Long> {
     private Long id;
     private String accessToken;
+    private String refreshToken;
     private int expiresIn;
 
 
@@ -16,6 +17,22 @@ public class Token implements Identifiable<Long> {
     public Token(String accessToken, int expiresIn) {
         this.accessToken = accessToken;
         this.expiresIn = expiresIn;
+    }
+
+    public Token(String accessToken,String refreshToken, int expiresIn) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.expiresIn = expiresIn;
+
+    }
+
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public String getAccessToken() {
@@ -49,6 +66,7 @@ public class Token implements Identifiable<Long> {
     public String toString() {
         return "Token{" +
                 "accessToken='" + accessToken + '\'' +
+                ", refreshToken='" + refreshToken + '\'' +
                 ", expiresIn=" + expiresIn +
                 '}';
     }

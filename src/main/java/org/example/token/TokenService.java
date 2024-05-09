@@ -2,10 +2,11 @@
 package org.example.token;
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.Logger;
 import org.example.authorization.AuthorizationRepository;
 import org.example.utils.JsonHandler;
 import org.example.utils.OAuthUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.io.IOException;
 public class TokenService {
     private final TokenRepository tokenRepository;
     private final AuthorizationRepository authorizationRepository;
-    Logger log = org.apache.logging.log4j.LogManager.getLogger(TokenService.class);
+    private Logger log = LoggerFactory.getLogger(TokenService.class);
 
     @Inject
     public TokenService(TokenRepository tokenRepository, AuthorizationRepository authorizationRepository) {
@@ -37,12 +38,14 @@ public class TokenService {
      * @param response
      */
     private void generateAccessTokens(HttpServletResponse response) {
-        log.info("Generating access tokens");
+        log.info("Generating access token");
         try {
             Token accessToken = new Token();
             accessToken.setExpiresIn(3600);
             accessToken.setAccessToken(OAuthUtils.generateAccessToken());
-            log.info("Generated access token: ", accessToken.toString());
+            accessToken.setRefreshToken(generateRefreshToken());
+            log.debug("Generated access token: {}", accessToken.toString());
+
             tokenRepository.save(accessToken);
             String jsonResponse = JsonHandler.toJson(accessToken);
 
@@ -50,6 +53,13 @@ public class TokenService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+
+    public String generateRefreshToken() {
+        log.info("Generating refresh token");
+        return OAuthUtils.generateRefreshToken();
+    }
+
+
 }
