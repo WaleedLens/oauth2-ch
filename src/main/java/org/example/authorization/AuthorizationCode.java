@@ -4,7 +4,6 @@ import org.example.annotations.TableEntity;
 import org.example.database.Identifiable;
 import org.example.token.TokenDTO;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 

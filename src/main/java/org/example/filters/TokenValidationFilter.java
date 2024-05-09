@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.exception.ValidationException;
 import org.example.token.TokenDTO;
 import org.example.utils.JsonHandler;
 import org.example.validation.TokenValidator;
@@ -32,7 +33,7 @@ public class TokenValidationFilter implements Filter {
             TokenDTO tokenDTO = (TokenDTO) JsonHandler.toObject(nodes.toPrettyString(), TokenDTO.class);
             httpRequest.setAttribute("tokenDTO", tokenDTO);
             chain.doFilter(request, response);
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             logger.error("Validation error: ", e);
             throw new ServletException("Invalid token request", e);
         }
