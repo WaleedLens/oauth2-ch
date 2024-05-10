@@ -98,7 +98,7 @@ public class TokenValidationFilter implements Filter {
 
             try {
                 // Validate the refresh token
-                tokenValidator.validateRefreshToken(nodes.get("refresh_token").asText());
+                tokenValidator.validateRefreshToken(nodes);
                 logger.info("Refresh token is valid");
                 // Convert the JsonNode object to a RefreshTokenDTO object
                 RefreshTokenDTO refreshTokenDTO = (RefreshTokenDTO) JsonHandler.toObject(nodes.toPrettyString(), RefreshTokenDTO.class);

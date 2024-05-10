@@ -3,7 +3,6 @@ package org.example.token;
 
 import com.google.inject.Inject;
 import org.example.authorization.AuthorizationRepository;
-import org.example.exception.InvalidTokenException;
 import org.example.utils.JsonHandler;
 import org.example.utils.OAuthUtils;
 import org.slf4j.Logger;
@@ -30,7 +29,12 @@ public class TokenService {
      * @param dto      --> From request body
      */
     public void initiateTokenGeneration(HttpServletResponse response, TokenDTO dto) {
-        generateAccessTokens(response);
+        try {
+            generateTokens(response, dto);
+        } catch (IOException e) {
+            log.error("Error generating access token ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -38,28 +42,25 @@ public class TokenService {
      *
      * @param response
      */
-    private void generateAccessTokens(HttpServletResponse response) {
+    private void generateTokens(HttpServletResponse response, TokenDTO dto) throws IOException {
         log.info("Generating access token");
         try {
-            Token accessToken = new Token();
-            accessToken.setExpiresIn(3600);
-            accessToken.setAccessToken(OAuthUtils.generateAccessToken());
-            accessToken.setRefreshToken(generateRefreshToken());
-            log.debug("Generated access token: {}", accessToken.toString());
+            Token token = new Token();
+            token.setExpiresIn(3600);
+            token.setAccessToken(OAuthUtils.generateAccessToken());
+            token.setRefreshToken(OAuthUtils.generateRefreshToken());
+            token.setClientId(Integer.parseInt(dto.getClientId()));
+            log.debug("Generated access token: {}", token.toString());
 
-            tokenRepository.save(accessToken);
-            String jsonResponse = JsonHandler.toJson(accessToken);
+            tokenRepository.save(token);
+            String jsonResponse = JsonHandler.toJson(token);
 
             response.getWriter().write(jsonResponse);
         } catch (IOException e) {
+            log.error("Error generating access token ", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to generate access token");
             throw new RuntimeException(e);
         }
-    }
-
-
-    public String generateRefreshToken() {
-        log.info("Generating refresh token");
-        return OAuthUtils.generateRefreshToken();
     }
 
 

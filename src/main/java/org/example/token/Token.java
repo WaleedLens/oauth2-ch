@@ -11,6 +11,7 @@ public class Token implements Identifiable<Long> {
     private String accessToken;
     private String refreshToken;
     private int expiresIn;
+    private int clientId;
     private Timestamp createdAt;
 
     public Token() {
@@ -25,6 +26,14 @@ public class Token implements Identifiable<Long> {
 
     }
 
+
+    public int getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
+    }
 
     public String getRefreshToken() {
         return refreshToken;
@@ -77,6 +86,7 @@ public class Token implements Identifiable<Long> {
                 ", refreshToken='" + refreshToken + '\'' +
                 ", expiresIn=" + expiresIn +
                 ", createdAt=" + createdAt +
+                ", clientId=" + clientId +
                 '}';
     }
 }

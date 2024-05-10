@@ -22,6 +22,7 @@ public class TokenController extends HttpServlet {
 
     /**
      * POST /token --> Generate new access & refresh tokens.
+     *
      * @param req
      * @param resp
      * @throws ServletException
@@ -41,6 +42,7 @@ public class TokenController extends HttpServlet {
 
     /**
      * GET /token --> Generate new access token by refresh token & return new access & refresh tokens.
+     *
      * @param req
      * @param resp
      * @throws ServletException
