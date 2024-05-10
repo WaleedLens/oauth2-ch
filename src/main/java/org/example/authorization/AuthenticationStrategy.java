@@ -7,6 +7,7 @@ import org.example.client.ClientRepository;
 import org.example.utils.OAuthUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public abstract class AuthenticationStrategy {
@@ -49,8 +50,8 @@ public abstract class AuthenticationStrategy {
             code.setClientId(authentication.getClientId());
             code.setRedirectUri(authentication.getRedirectUri());
             code.setScope(authentication.getScope());
-            code.setCreatedDate(new Date());
-            code.setExpirationDate(new Date(System.currentTimeMillis() + 10 * 60 * 1000)); // Expires in 10 minutes
+            code.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+            code.setExpirationDate(new Timestamp(System.currentTimeMillis() + 10 * 60 * 1000)); // Expires in 10 minutes
             authorizationCodeRepository.save(code);
 
 

@@ -23,7 +23,7 @@ public class AuthenticationController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.info("Starting doGet method");
 
-        Authentication authentication = (Authentication) req.getAttribute("authentication");
+        Authentication authentication = (Authentication) req.getAttribute("Authentication");
         logger.info("Request parameters: {}", authentication.toString());
 
         try {
@@ -35,6 +35,7 @@ public class AuthenticationController extends HttpServlet {
 
         logger.info("Finished doGet method");
         resp.setStatus(HttpServletResponse.SC_OK);
+
     }
 
 

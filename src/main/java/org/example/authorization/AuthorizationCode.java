@@ -4,7 +4,8 @@ import org.example.annotations.TableEntity;
 import org.example.database.Identifiable;
 import org.example.token.TokenDTO;
 
-import java.util.Date;
+
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @TableEntity(tableName = "authorization_code")
@@ -14,8 +15,8 @@ public class AuthorizationCode implements Identifiable<Long> {
     private long clientId;
     private String redirectUri;
     private String scope;
-    private Date createdDate;
-    private Date expiryDate;
+    private Timestamp createdDate;
+    private Timestamp expiryDate;
 
 
 
@@ -55,19 +56,19 @@ public class AuthorizationCode implements Identifiable<Long> {
     }
 
 
-    public void setExpirationDate(Date expiryDate) {
+    public void setExpirationDate(Timestamp expiryDate) {
         this.expiryDate = expiryDate;
     }
 
-    public Date getExpirationDate() {
+    public Timestamp getExpirationDate() {
         return expiryDate;
     }
 
-    public Date getCreatedDate() {
+    public Timestamp getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(Timestamp createdDate) {
         this.createdDate = createdDate;
     }
 

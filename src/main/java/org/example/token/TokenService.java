@@ -37,6 +37,8 @@ public class TokenService {
         }
     }
 
+
+
     /**
      * Generates access tokens and saves them in the database.
      *
@@ -50,7 +52,7 @@ public class TokenService {
             token.setAccessToken(OAuthUtils.generateAccessToken());
             token.setRefreshToken(OAuthUtils.generateRefreshToken());
             token.setClientId(Integer.parseInt(dto.getClientId()));
-            log.debug("Generated access token: {}", token.toString());
+            log.debug("Generated token: {}", token.toString());
 
             tokenRepository.save(token);
             String jsonResponse = JsonHandler.toJson(token);
@@ -62,6 +64,8 @@ public class TokenService {
             throw new RuntimeException(e);
         }
     }
+
+
 
 
 

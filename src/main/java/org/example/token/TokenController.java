@@ -50,7 +50,16 @@ public class TokenController extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        try {
+            RefreshTokenDTO refreshTokenDTO = (RefreshTokenDTO) req.getAttribute("refreshTokenDTO");
+            logger.info("Refresh token request: {}", refreshTokenDTO);
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setClientId(String.valueOf(refreshTokenDTO.getClientId()));
+            tokenService.initiateTokenGeneration(resp, tokenDTO);
+        } catch (Exception e) {
+            logger.error("Error processing refresh token request: ", e);
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        }
     }
 
 }

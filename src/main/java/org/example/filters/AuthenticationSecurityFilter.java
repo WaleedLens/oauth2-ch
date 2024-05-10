@@ -1,6 +1,8 @@
 package org.example.filters;
 
 import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.authorization.Authentication;
 import org.example.client.Client;
 import org.example.client.ClientRepository;
@@ -11,9 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AuthenticationSecurityFilter implements Filter {
+    private static final Logger logger = LogManager.getLogger(AuthenticationSecurityFilter.class);
+
 
     @Inject
     private ClientRepository clientRepository;
+
 
 
     @Override
@@ -25,7 +30,10 @@ public class AuthenticationSecurityFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         Authentication authentication = extractParameters(req);
+        logger.debug("Authentication request: {}", authentication);
+
         if (validateAuthentication(authentication)) {
+            logger.info("Authentication request is valid");
             req.setAttribute("Authentication", authentication);
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
@@ -36,6 +44,7 @@ public class AuthenticationSecurityFilter implements Filter {
 
 
     private boolean validateAuthentication(Authentication authentication) {
+        logger.debug("Validating authentication request: {}", authentication);
         Client client = clientRepository.find(authentication.getClientId());
         if (client == null) {
             throw new IllegalArgumentException("Invalid client id");
@@ -51,6 +60,7 @@ public class AuthenticationSecurityFilter implements Filter {
 
 
     private Authentication extractParameters(HttpServletRequest req) {
+        logger.info("Extracting parameters from request");
         String responseType = req.getParameter("response_type");
         String clientId = req.getParameter("client_id");
         String redirectUri = req.getParameter("redirect_uri");
