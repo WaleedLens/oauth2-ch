@@ -52,15 +52,13 @@ public class TokenValidationFilter implements Filter {
         try {
             // Parse the JSON from the client's request
             JsonNode nodes = JsonHandler.readTree(httpRequest.getReader());
+
+              // Check if the grant type is a refresh token
+
+            handleRefreshTokenValidation(nodes, request, response, chain);
+
             // Validate the token
             tokenValidator.validate(nodes);
-            // Check if the grant type is a refresh token
-            if (nodes.get("grant_type").equals(GrantType.refresh_token.toString())) {
-                // Handle the refresh token validation
-                handleRefreshTokenValidation(nodes, request, response, chain);
-                return;
-            }
-
             // Log that the token request is valid
             logger.info("Token request is valid");
 
@@ -94,8 +92,8 @@ public class TokenValidationFilter implements Filter {
     private void handleRefreshTokenValidation(JsonNode nodes, ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         // Check if the grant type is a refresh token
-        if (nodes.get("grant_type").equals(GrantType.refresh_token.toString())) {
-
+        logger.info("Checking if grant type is refresh token");
+        if (nodes.get("grant_type").asText().equals(GrantType.refresh_token.toString())) {
             try {
                 // Validate the refresh token
                 tokenValidator.validateRefreshToken(nodes);
