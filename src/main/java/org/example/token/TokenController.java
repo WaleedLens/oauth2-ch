@@ -20,6 +20,13 @@ public class TokenController extends HttpServlet {
         this.tokenService = tokenService;
     }
 
+    /**
+     * POST /token --> Generate new access & refresh tokens.
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -31,4 +38,17 @@ public class TokenController extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
+
+    /**
+     * GET /token --> Generate new access token by refresh token & return new access & refresh tokens.
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+    }
+
 }

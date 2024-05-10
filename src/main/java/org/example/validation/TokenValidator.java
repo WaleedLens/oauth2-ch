@@ -1,16 +1,20 @@
 package org.example.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
+import org.example.exception.InvalidTokenException;
 import org.example.exception.ValidationException;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.example.token.Token;
+import org.example.token.TokenRepository;
+import org.example.utils.OAuthUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TokenValidator implements Validator<JsonNode> {
+    @Inject
+    private TokenRepository tokenRepository;
 
+    private final static Logger log = LoggerFactory.getLogger(TokenValidator.class);
 
     @Override
     public void validate(JsonNode jsonNode) throws ValidationException {
@@ -22,13 +26,15 @@ public class TokenValidator implements Validator<JsonNode> {
         validateClientSecret(jsonNode);
     }
 
-    /**
-     * Verifying that the refresh token exists in your database.
-     * Checking that it has not been revoked or expired.
-     * Ensuring that the client_id associated with the request matches the client_id that was used to obtain the refresh token.
-     */
-    public void validateRefreshToken(JsonNode node){
+    public boolean validateRefreshToken(String refreshToken) throws InvalidTokenException {
+        Token token = tokenRepository.findByField("refresh_token", refreshToken);
+        log.debug("Token found: {}", token);
+        if (OAuthUtils.isExpired(token.getExpiresIn(), token.getCreatedAt())) {
+            log.error("Refresh token expired: {}", token.getRefreshToken());
+            throw new InvalidTokenException("Refresh token expired");
+        }
 
+        return true;
     }
 
     private void validateGrantType(JsonNode node) throws ValidationException {

@@ -16,6 +16,7 @@ public class TokenDTO {
     @JsonProperty("redirect_uri")
     private String redirectUri;
 
+
     public TokenDTO() {
     }
 

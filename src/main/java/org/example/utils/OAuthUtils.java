@@ -81,5 +81,25 @@ public class OAuthUtils {
         return new BigInteger(160, secureRandom).toString(32);
     }
 
+    /**
+     * Checks if a certain time period has expired.
+     *
+     * @param expire_seconds The duration of the time period in seconds.
+     * @param created The starting point of the time period as a Date object.
+     * @return A boolean value indicating whether the time period has expired. Returns true if the time period has expired, false otherwise.
+     */
+    public static boolean isExpired(int expire_seconds, Date created) {
+        // Create a new Date object representing the current time
+        Date now = new Date();
+
+        // Calculate the difference in milliseconds between the current time and the created time
+        long diff = now.getTime() - created.getTime();
+
+        // Convert the difference to seconds
+        long diffSeconds = diff / 1000 % 60;
+
+        // Return true if the difference in seconds is greater than the expire_seconds parameter, false otherwise
+        return diffSeconds > expire_seconds;
+    }
 
 }

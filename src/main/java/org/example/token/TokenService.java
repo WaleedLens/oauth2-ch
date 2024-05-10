@@ -3,6 +3,7 @@ package org.example.token;
 
 import com.google.inject.Inject;
 import org.example.authorization.AuthorizationRepository;
+import org.example.exception.InvalidTokenException;
 import org.example.utils.JsonHandler;
 import org.example.utils.OAuthUtils;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class TokenService {
         log.info("Generating refresh token");
         return OAuthUtils.generateRefreshToken();
     }
+
+
 
 
 }

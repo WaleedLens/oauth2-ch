@@ -3,21 +3,20 @@ package org.example.token;
 import org.example.annotations.TableEntity;
 import org.example.database.Identifiable;
 
+import java.sql.Timestamp;
+
 @TableEntity(tableName = "tokens")
 public class Token implements Identifiable<Long> {
     private Long id;
     private String accessToken;
     private String refreshToken;
     private int expiresIn;
-
+    private Timestamp createdAt;
 
     public Token() {
     }
 
-    public Token(String accessToken, int expiresIn) {
-        this.accessToken = accessToken;
-        this.expiresIn = expiresIn;
-    }
+
 
     public Token(String accessToken,String refreshToken, int expiresIn) {
         this.accessToken = accessToken;
@@ -51,6 +50,15 @@ public class Token implements Identifiable<Long> {
         this.expiresIn = expiresIn;
     }
 
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public Long getId() {
         return 0L;
@@ -68,6 +76,7 @@ public class Token implements Identifiable<Long> {
                 "accessToken='" + accessToken + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 ", expiresIn=" + expiresIn +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }
