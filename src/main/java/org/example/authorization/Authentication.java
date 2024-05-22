@@ -7,6 +7,9 @@ public class Authentication {
     private String state;
     private String scope;
 
+    public Authentication(){
+
+    }
 
     public Authentication(String responseType, long clientId, String redirectUri, String state, String scope) {
         this.responseType = responseType;
