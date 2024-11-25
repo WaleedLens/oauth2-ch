@@ -28,3 +28,26 @@ This project implements an OAuth 2.0 authorization server using Java with embedd
 - Java 19 or higher
 - PostgreSQL database
 - Maven
+
+
+
+## Request Processing Pipeline
+
+### Filter Chain Architecture
+The application implements a filter chain for OAuth2.0 endpoints with two main security layers:
+
+```ascii
++---------------+     +-------------------------+     +----------------------+
+|               |     |                         |     |                      |
+| Client Request|---->| AuthenticationFilter    |---->| AuthenticationServlet|
+|               |     |                         |     |                      |
++---------------+     +-------------------------+     +----------------------+
+                                  |
+                                  |
+                                  v
++---------------+     +-------------------------+     +----------------------+
+|               |     |                         |     |                      |
+| Token Request |---->| TokenValidationFilter   |---->| TokenServlet        |
+|               |     |                         |     |                      |
++---------------+     +-------------------------+     +----------------------+
+
